@@ -36,23 +36,22 @@
 #' @export
 
 
-
-
 POST <- function( YY, #response
                   XX, #covariant
                   OTU, #OTU table
                   tree, #phylogeney three
                   cValues = seq(0,0.05,0.01),
-                  #kernel,
                   trait = 'binomial', #continous or binomial
                   verbose = FALSE) {
 
-  options(warn = -1)
+  #options(warn = -1)
   options(scipen=999)
+  
   OTU     <- as.matrix(OTU)
   nsubj   <- nrow(OTU)
   nOTU    <- ncol(OTU)
 
+  XX <- as.matrix(XX)
 
   kernellist <- getkernellist(cValues = cValues,
                               tree    = tree,
