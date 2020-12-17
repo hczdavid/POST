@@ -15,15 +15,12 @@ GUniFrac, CompQuadForm, ACAT.
 We adapt two functions (CKAT.bin and CKAT.con) from CKAT pacakge calculate p-value (Debashis Ghosh and Xiang Zhan. "CKAT software").
 
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
-```
-
 ### Installation
 
 ```{r}
 devtools::install_github("hczdavid/POST")
 ```
+
 
 
 
