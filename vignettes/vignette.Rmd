@@ -1,0 +1,78 @@
+---
+title: "POST_vignettes"
+author: "Caizhi Huang"
+date: "12/2020"
+output: rmarkdown::html_vignette
+
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+### Overview
+
+The POST package is the implementation of our recent method Phylogeny-Guided Microbiome OTU-Specific Association Test. POST boosts the testing power by adaptively borrowing information from phylogenetically close OTUs of the target OTU. Whether or not borrowing information or the amount of information from the neighboring OTUs is data adaptive and supervised by phylogenetic distance and the outcome variable. POST is built on a kernel machine regression framework and inherited the advantages including flexibly model complex microbiome effects (e.g., effects from opposite direction), easily adjust for covariates, and accommodate both continuous and binary outcomes. POST extends the current global kernel tests to OTU-level test using a OTU-specific kernel.
+
+
+### Dependencies
+
+The following packages are required for functions and examples in the POST package: 
+
+CompQuadForm, ACAT. 
+
+We adapt two functions (CKAT.bin and CKAT.con) from CKAT pacakge calculate p-value (Debashis Ghosh and Xiang Zhan. "CKAT software").
+
+
+### Installation
+
+```{r}
+if(!require("POST", character.only = TRUE)){
+  devtools::install_github("hczdavid/POST", ref = "main")
+}
+```
+
+### Example Dataset
+
+In this vignette, we use the OTU the vaginal microbiome from Subramaniam et al (2016). The dataset consists 39 individuals with 19 bacterial vaginosis (BV) patients and 20 health control. The sequencing data and metadata (e.g., race) are publicly available at NCBI SRA database (PRJNA600021). We aim to detect the OTUs are significantly different between BV group and control with adjustment of race. After data processing, we have 2711 OTUs formed at 97% similarity. FastTree (Price et al, 2010) is used to construct the phylogenetic tree. 
+
+
+```{r}
+# Load the example data, including otudata, otutree, metadata, otuseq
+load("example.Rdata")
+otutree <- ape::as.phylo(otutree)
+```
+
+### Data Preparation 
+
+we filter out OTUs with abundance < 0.005% and prevalence < 10%, and analyze the resulting 189 OTUs. 
+
+```{r}
+library(POST)
+library(ACAT)
+library(CompQuadForm)
+
+# data filtering
+otu_abun   <- colMeans(otudata/rowSums(otudata))
+otu_filter <- otudata[,which(otu_abun > 0.00005)] # by abundacne
+otu_filter <- otu_filter[,colSums(otu_filter!=0) >= 4] # by prevalence
+
+# metadata
+YY <- as.numeric(metadata$GC == "BV")
+ZZ <- as.numeric(metadata$mRace == "B")
+
+class(otutree)
+
+result <- POST::POST(YY = YY,
+               XX = ZZ,
+               OTU = otu_filter,
+               trait = "binomial",
+               cValues = seq(0,0.05,by=0.01),
+               tree = otutree)
+
+
+head(result)
+
+```
+
