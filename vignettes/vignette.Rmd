@@ -2,8 +2,9 @@
 title: "POST_vignettes"
 author: "Caizhi Huang"
 date: "12/2020"
-output: rmarkdown::html_vignette
-
+output:
+  html_document:
+    df_print: paged
 ---
 
 
@@ -61,8 +62,6 @@ otu_filter <- otu_filter[,colSums(otu_filter!=0) >= 4] # by prevalence
 # metadata
 YY <- as.numeric(metadata$GC == "BV")
 ZZ <- as.numeric(metadata$mRace == "B")
-
-class(otutree)
 
 result <- POST::POST(YY = YY,
                XX = ZZ,
